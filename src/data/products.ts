@@ -48,7 +48,7 @@ export const products: Product[] = [
     id: 4,
     name: "Sunset Heart Magnetic Couple Set",
     category: "Handmade Gift Collection",
-    image: "/images/product-4.jpeg",
+    image: "/images/product-4.png",
     description:
       "Matching pair of coral red and butter yellow bead bracelets connected by a magnetic heart charm. Perfect for couples and best friends.",
     tag: "Gift Ready",
