@@ -84,7 +84,7 @@ export const products: Product[] = [
     id: 8,
     name: "Flora Wire Necklace Collection",
     category: "Minimal Wire Jewelry",
-    image: "/images/product-8.jpeg",
+    image: "/images/product-8.png",
     description:
       "Set of 4 handcrafted wire necklaces with gemstone floral charms in emerald, sapphire, ruby, and amethyst tones.",
     tag: "Exclusive",
