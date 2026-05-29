@@ -1,28 +1,33 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { siteStatusConfig } from "../config/siteStatus";
 
 /**
  * Next.js 16 Proxy (formerly Middleware)
  * ======================================
  * Intercepts all incoming requests and checks if the site is locked.
- *
- * When SITE_LOCKED=true:
- *   - All page requests are rewritten to /site-locked
- *   - Static assets (_next/static, images, etc.) pass through
- *   - The /site-locked route itself passes through (no loop)
- *
- * When SITE_LOCKED is not "true":
- *   - All requests pass through normally — zero overhead
  */
 export function proxy(request: NextRequest) {
-  const isLocked = process.env.SITE_LOCKED === "true";
+  // Check both environment variable and fallback to the config file
+  const envLocked = (process.env.SITE_LOCKED || "").trim() === "true";
+  const configLocked = siteStatusConfig.siteLocked;
+  const isLocked = envLocked || configLocked;
+
+  const { pathname } = request.nextUrl;
+
+  // Always allow static files, images, and API routes to pass through
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/images") ||
+    pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|css|js)$/)
+  ) {
+    return NextResponse.next();
+  }
 
   // If site is not locked, pass through immediately
   if (!isLocked) {
     return NextResponse.next();
   }
-
-  const { pathname } = request.nextUrl;
 
   // Allow the lock page itself to render (prevent redirect loop)
   if (pathname === "/site-locked") {
@@ -32,16 +37,18 @@ export function proxy(request: NextRequest) {
   // Rewrite all other page requests to the lock page
   const url = request.nextUrl.clone();
   url.pathname = "/site-locked";
-  return NextResponse.rewrite(url);
+  return NextResponse.rewrite(url, {
+    headers: {
+      "x-site-locked": "true"
+    }
+  });
 }
 
 /**
  * Matcher configuration:
- * Only intercept page/document requests.
- * Skip static files, image optimization, and metadata files.
+ * Catch all paths and let the proxy function handle the exclusion logic.
+ * This is more robust on Vercel Edge than complex regex matchers.
  */
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon\\.ico|images|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
-  ],
+  matcher: "/:path*",
 };
