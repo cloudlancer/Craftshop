@@ -34,3 +34,31 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Site Lock Mode (Hosting Exceeded)
+
+A temporary lock system that shows a "Hosting Resource Limit Exceeded" page to all visitors.
+
+### Activate (Lock the Site)
+
+**Locally:** Set `SITE_LOCKED=true` in `.env.local`, then restart the dev server.
+
+**On Vercel:** Add environment variable `SITE_LOCKED=true` in Vercel Dashboard → Settings → Environment Variables, then redeploy.
+
+### Deactivate (Unlock the Site)
+
+Change `SITE_LOCKED` to `false` (or remove it), then restart/redeploy.
+
+### Configuration
+
+Edit `config/siteStatus.ts` to change:
+- `renewUrl` — where the "Renew Hosting" button links to
+- `contactEmail` — the "Contact Administrator" email address
+
+### Rollback (Full Removal)
+
+Delete these files to completely remove the lock system:
+1. `src/proxy.ts`
+2. `src/app/site-locked/` (folder)
+3. `config/` (folder)
+4. `.env.local` and `.env.example`
